@@ -1251,6 +1251,11 @@ generating of the canonical byte formats in any language that supports FFI.</p>
 <p>The encoding is fixed at 64-bytes:</p>
 <pre><code class="language-text">| 32-byte public key | 32-byte scalar |
 </code></pre>
+<h4 id="signature"><a class="header" href="#signature">Signature</a></h4>
+<p>A signature tuple consists of a <code>&lt;R, s&gt;</code> where <code>R</code> is the public nonce and <code>s</code> is the signature scalar.</p>
+<p>The encoding is fixed at 64-bytes:</p>
+<pre><code class="language-text">| 32-byte commitment (R) | 32-byte scalar (s) |
+</code></pre>
 <h4 id="commitment-signature"><a class="header" href="#commitment-signature">Commitment Signature</a></h4>
 <p>A commitment signature tuple consists of a <code>&lt;R, u, v&gt;</code> where <code>R</code> is the <a href="./Glossary.html#commitment">Pederson commitment</a> \(r_u.G + r_v.H\)
 for the signature scalars <code>u</code> and <code>v</code>.</p>
@@ -1290,6 +1295,7 @@ produce the same encoding as non-null <code>dob</code>.</p>
 <li><code>prev_hash</code> - fixed 32-bytes </li>
 <li><code>timestamp</code> - varint</li>
 <li><code>input_mr</code> - fixed 32-bytes</li>
+<li><code>output_mr</code> - fixed 32-bytes</li>
 <li><code>output_mmr_size</code> - varint</li>
 <li><code>witness_mr</code> - fixed 32-bytes</li>
 <li><code>kernel_mr</code> - fixed 32-bytes</li>
@@ -1347,7 +1353,7 @@ produce the same encoding as non-null <code>dob</code>.</p>
 </ul>
 <h4 id="transaction-output"><a class="header" href="#transaction-output">Transaction Output</a></h4>
 <pre><code class="language-rust ignore">pub struct TransactionOutput {
-    pub version: u8,
+    pub version: TransactionInputVersion,
     pub features: OutputFeatures,
     pub commitment: Commitment,
     pub proof: RangeProof,
@@ -1371,7 +1377,7 @@ and the input spending that output i.e. <code>output_hash = Hash(version | featu
 <p>The witness hash is appended to the witness Merkle tree.</p>
 <ul>
 <li><code>proof</code> - Raw proof bytes encoded using <a href="RFC-0121_ConsensusEncoding.html#dynamically-sized-vec-encoding">dynamic vector</a> encoding</li>
-<li><code>metadata_signature</code> - [CommitementSiganture]</li>
+<li><code>metadata_signature</code> - [CommitmentSignature]</li>
 </ul>
 <h5 id="metadata-signature-challenge"><a class="header" href="#metadata-signature-challenge">Metadata signature challenge</a></h5>
 <p>See <a href="./Glossary.html#metadata-signature">Metadata Signature</a> for details.</p>
@@ -1390,7 +1396,6 @@ to optimise storage and transmission of the input. </p>
   pub version: u8,
   pub input_data: ExecutionStack,
   pub script_signature: ComSignature,
-  // Output data
   pub output_version: TransactionOutputVersion,
   pub features: OutputFeatures,
   pub commitment: Commitment,
@@ -1405,8 +1410,30 @@ to optimise storage and transmission of the input. </p>
 <li><code>output_hash</code> - See [TransactionOutput]</li>
 <li><code>sender_offset_public_key</code> - <a href="RFC-0121_ConsensusEncoding.html#ristretto-keys">RistrettoPublicKey</a></li>
 <li><code>input_data</code> - <a href="https://github.com/tari-project/tari-crypto/blob/09cc52787272ced3a1a8c9f2edc1e0221f9d8faa/src/script/stack.rs#L51">TariScript Stack</a></li>
-<li><code>script_signature</code> - [CommitementSiganture]</li>
+<li><code>script_signature</code> - [CommitmentSignature]</li>
 </ul>
+<h3 id="transaction-kernel"><a class="header" href="#transaction-kernel">Transaction Kernel</a></h3>
+<p>The following struct represents the full transaction input data for reference. The actual input struct does not duplicate the output data
+to optimise storage and transmission of the input.</p>
+<pre><code class="language-rust ignore">pub struct TransactionKernel {
+    pub version: TransactionKernelVersion,
+    pub features: KernelFeatures,
+    pub fee: MicroTari,
+    pub lock_height: u64,
+    pub excess: Commitment,
+    pub excess_sig: Signature,
+}
+</code></pre>
+<p>The transaction kernel is encoded as follows:</p>
+<ul>
+<li><code>input_version</code> - 1 byte</li>
+<li><code>features</code> - <a href="RFC-0121_ConsensusEncoding.html#output-features">OutputFeatures</a></li>
+<li><code>fee</code> - <a href="RFC-0121_ConsensusEncoding.html#ristretto-keys">RistrettoPublicKey</a></li>
+<li><code>lock_height</code> - <a href="https://github.com/tari-project/tari-crypto/blob/09cc52787272ced3a1a8c9f2edc1e0221f9d8faa/src/script/stack.rs#L51">TariScript Stack</a></li>
+<li><code>excess</code> - <a href="RFC-0121_ConsensusEncoding.html#commitment">Commitment</a></li>
+<li><code>excess_sig</code> - [Signature]</li>
+</ul>
+<p>The canonical hash pre-image is constructed from this encoding.</p>
 <h4 id="script-challenge"><a class="header" href="#script-challenge">Script Challenge</a></h4>
 <p>For details see <a href="./RFC-0201_TariScript.html">RFC-0201_TariScript.md</a>.</p>
 <p>The script challenge is constructed as follows:</p>
