@@ -377,7 +377,7 @@ deployed as part of the Tari network.</p>
 <ul>
 <li>A base node executable (tari_base_node)</li>
 <li>A Command Line Interface (CLI) wallet for the Tari cryptocurrency (tari_console_wallet)</li>
-<li>A standalone miner (tari_mining_node)</li>
+<li>A standalone miner (tari_miner)</li>
 <li>A mining proxy to enable merge mining Monero (tari_merge_mining_proxy)</li>
 <li>An Application Programming Interface (API) server for the base node (REST, gRPC, etc.)</li>
 </ul>
@@ -394,7 +394,7 @@ deployed as part of the Tari network.</p>
 <ul>
 <li><code>tari_base_node</code> - the Base Node application</li>
 <li><code>tari_console_wallet</code> - the CLI Wallet application</li>
-<li><code>tari_mining_node</code> - the SHA3 Mining Node (CPU)</li>
+<li><code>tari_miner</code> - the SHA3 Miner (CPU)</li>
 <li><code>tari_merge_mining_proxy</code> - the Merge Mining Proxy</li>
 <li><code>tari_explorer</code> - a local web based block explorer</li>
 </ul>
@@ -457,9 +457,9 @@ SERVICES; LOSS OF USE, DATA OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
 WHETHER IN CONTRACT, STRICT LIABILITY OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
 <h2 id="language-2"><a class="header" href="#language-2">Language</a></h2>
-<p>The keywords &quot;MUST&quot;, &quot;MUST NOT&quot;, &quot;REQUIRED&quot;, &quot;SHALL&quot;, &quot;SHALL NOT&quot;, &quot;SHOULD&quot;, &quot;SHOULD NOT&quot;, &quot;RECOMMENDED&quot;, 
-&quot;NOT RECOMMENDED&quot;, &quot;MAY&quot; and &quot;OPTIONAL&quot; in this document are to be interpreted as described in 
-<a href="https://tools.ietf.org/html/bcp14">BCP 14</a> (covering RFC2119 and RFC8174) when, and only when, they appear in all capitals, as 
+<p>The keywords &quot;MUST&quot;, &quot;MUST NOT&quot;, &quot;REQUIRED&quot;, &quot;SHALL&quot;, &quot;SHALL NOT&quot;, &quot;SHOULD&quot;, &quot;SHOULD NOT&quot;, &quot;RECOMMENDED&quot;,
+&quot;NOT RECOMMENDED&quot;, &quot;MAY&quot; and &quot;OPTIONAL&quot; in this document are to be interpreted as described in
+<a href="https://tools.ietf.org/html/bcp14">BCP 14</a> (covering RFC2119 and RFC8174) when, and only when, they appear in all capitals, as
 shown here.</p>
 <h2 id="disclaimer-2"><a class="header" href="#disclaimer-2">Disclaimer</a></h2>
 <p>This document and its content are intended for information purposes only and may be subject to change or update
@@ -483,8 +483,8 @@ technological merits of the potential system outlined herein.</p>
 <li>Base Layer full node implementation. The base layer full nodes are the consensus-critical pieces of software for the
 Tari base layer and cryptocurrency. The base nodes validate and transmit transactions and blocks, and maintain
 consensus about the longest valid proof-of-work blockchain.</li>
-<li>Mining software. Mining nodes perform proof-of-work to secure the base layer and compete to submit the
-next valid block into the Tari blockchain. Tari uses two Proof of Work (PoW) algorithms, the first is merge-mined with Monero and a second native SHA3 PoW. 
+<li>Mining software. Miners perform proof-of-work to secure the base layer and compete to submit the
+next valid block into the Tari blockchain. Tari uses two Proof of Work (PoW) algorithms, the first is merge-mined with Monero and a second native SHA3 PoW.
 The Tari source provides three alternatives for Tari miners:
 <ul>
 <li>A standalone miner for SHA3 mining</li>
