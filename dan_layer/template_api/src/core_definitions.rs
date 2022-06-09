@@ -1,5 +1,37 @@
 use crate::macros::*;
 
+//! Sample template definition
+//!
+//! Registered code comprises 2 first-class citizens:
+//! * Assets - which are _things_ and only hold state.
+//!   * They are composable
+//!   * Extendable
+//! * Operations - which are _verbs_ and are small groups of related functions that
+//!   * if read-only, can return a result
+//!   * if there are side-effects, Return nothing on success, or an error.
+//!   * May take assets and primitives as arguments
+//!   * May cause side-effects
+//!   * May emit events
+//!   * Are atomic
+//!
+//!   Factory operations are able to create new assets (ala constructors)
+//!
+//! In addition to assets and operations, the template VM
+//! * understands the notion of a set of primitive objects (integers, Strings, collection types) that are always copied by value.
+//! * provides an [events] API
+//! * provides a library of useful crypto functions, signature methods, and Tari blockchain API.
+//! * authorisation is handled by means of bearer token (macaroons)
+//!
+//!
+//! Templates are defined in a Rust module using the helper macros [`define_asset!`] and [`define_operations!`].
+//!
+//! Templates are compiled and packaged into WASM using the Tari helper tools:
+//! `cargo tari template package [options] module`
+//!
+//! Templates have a deterministic hash that is registered on the Tari base layer.
+//! `cargo tari template register [options] module`
+//! Options include things like where to locate the source (e.g. ipfs / github) and access to a wallet to pay for the
+//! registration fees
 // ---------------------------------------------    Core Assets    -----------------------------------------------------
 /// In the desugaring, the definition
 /// * gets converted into a struct named `BaseAsset` (todo: can't concat `Asset` in mock macro. But can in proc macro)
@@ -8,13 +40,13 @@ use crate::macros::*;
 
 define_asset!{
     Base {
-        assetId: Hash256
+        assetId: AssetHash
     }
 }
 
 define_asset! {
     Named extends Base {
-        name: String256
+        name: TariString
     }
 }
 
@@ -31,32 +63,32 @@ define_asset! {
 }
 // ---------------------------------------------   Core Actions    -----------------------------------------------------
 
-define_action! {
-    Name {
+define_operations! {
+    NameOperations {
         #[readable]
         #[auth(None)]
-        fn getName(this: Named) -> String {
+        fn getName(this: Named) -> TariString {
           Ok(this.name)
         }
 
         #[writable]
         #[auth(Roles: [SET_NAME])]
-        fn setName(this: Named, newName: String) {
+        fn setName(this: Named, newName: TariString) {
             this.name = newName;
             emit!("{} name change to {}", this.assetId, this.owner);
         }
     }
 }
 
-/// In the desugaring, the action defintion gets converted into a struct, `OwnerAction`.
-/// * The marker trait `TariAction` is implemented on it (todo: can't concat `Asset` in mock macro. But can in proc macro)
+/// In the de-sugaring, the action definition gets injected into a struct, `OwnerOperationTemplate`.
+/// * The marker trait `TariOperation` is implemented on it
 /// * WASM bindings for the action are created.
 /// For each function definition, a function ABI definition is constructed so that
 /// * `callReadable("getOwner", Auth::default())`
 /// * `callWritable("setOwner", myAuth, newOwnerPubkey)`
-/// are registered on the underlying action definition
-define_action! {
-    Owner {
+/// are registered on the underlying operation template definition
+define_operations! {
+    OwnerOperations {
         #[readable]
         #[auth(None)]
         fn getOwner(this: Owned) -> PublicKey {
@@ -85,8 +117,8 @@ define_action! {
 
 define_asset! {
     NonFungibleToken extends Base, Owned  {{
-        tokenId: u64;
-        properties: u8;
+        tokenId: TariInteger;
+        properties: Bitmask;
     }}
 }
 
