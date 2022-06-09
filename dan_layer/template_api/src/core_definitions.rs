@@ -13,6 +13,7 @@ use crate::macros::*;
 //!   * May cause side-effects
 //!   * May emit events
 //!   * Are atomic
+//!   * Can define default authorisation roles, which can be overridden in contract definitions.
 //!
 //!   Factory operations are able to create new assets (ala constructors)
 //!
@@ -66,7 +67,7 @@ define_asset! {
 define_operations! {
     NameOperations {
         #[readable]
-        #[auth(None)]
+        #[DefaultAuth(Everyone)]
         fn getName(this: Named) -> TariString {
           Ok(this.name)
         }
