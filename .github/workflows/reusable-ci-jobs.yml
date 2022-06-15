@@ -141,6 +141,11 @@
             uses: actions/setup-node@v3
             with:
               node-version: "16"
+          - name: check environment
+            run: |
+              node -v
+              npm -v
+              yarn -v
           - name: build gui-react
             if: ${{ inputs.build-launchpad-fe }}
             # Replace 'yarn build' with 'yarn tauri build' to build both, fronted (react) and backend
