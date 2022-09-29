@@ -18,6 +18,8 @@
 use std::convert::TryFrom;
 
 use serde::{Deserialize, Serialize};
+use strum::EnumCount;
+use strum_macros::EnumCount as EnumCountMacro;
 use tari_crypto::ristretto::{pedersen::PedersenCommitment, RistrettoPublicKey, RistrettoSchnorr, RistrettoSecretKey};
 use tari_utilities::{
     hex::{from_hex, to_hex, Hex, HexError},
@@ -54,7 +56,9 @@ pub const TYPE_PUBKEY: u8 = 4;
 pub const TYPE_SIG: u8 = 5;
 pub const TYPE_SCALAR: u8 = 6;
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+// TODO: In a near future we can replace strum::EnumCountMacro for std::mem::variant_count.
+// We can follow std::mem::variant_count here: https://github.com/rust-lang/rust/issues/73662.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, EnumCountMacro)]
 pub enum StackItem {
     Number(i64),
     Hash(HashValue),
@@ -63,6 +67,8 @@ pub enum StackItem {
     PublicKey(RistrettoPublicKey),
     Signature(RistrettoSchnorr),
 }
+
+type StackItemValues = [u8; StackItem::COUNT];
 
 impl StackItem {
     /// Convert an input item into its binary representation and append it to the array. The function returns the byte
@@ -319,7 +325,7 @@ impl Hex for ExecutionStack {
 
 /// Utility function that given a count of `StackItem` variants, adds 1 for the given item.
 #[allow(clippy::many_single_char_names)]
-fn counter(values: [u8; 6], item: &StackItem) -> [u8; 6] {
+fn counter(values: StackItemValues, item: &StackItem) -> StackItemValues {
     let [n, h, c, p, s, z] = values;
     #[allow(clippy::enum_glob_use)]
     use StackItem::*;
