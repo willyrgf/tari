@@ -176,7 +176,7 @@ jobs:
           echo "C:\Strawberry\perl\bin" >> $GITHUB_PATH
 
       - name: Cache cargo files and outputs
-        uses: Swatinem/rust-cache@v1
+        uses: Swatinem/rust-cache@v2
 
       - name: Revert Cargo.toml for Ubuntu to cross-compile ARM64
         if: ${{ startsWith(runner.os,'Linux') && matrix.builds.name == 'linux-arm64' }}
